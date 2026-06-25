@@ -156,6 +156,59 @@
     text-align: center; margin-top: 16px; line-height: 1.6;
   }
  
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(5,6,14,0.72);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+  .modal-overlay.open { opacity: 1; visibility: visible; }
+  .modal-box {
+    width: 100%; max-width: 420px;
+    background: #11142e;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.55);
+    padding: 40px 32px 32px;
+    text-align: center;
+    transform: translateY(16px) scale(0.97);
+    transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1);
+  }
+  .modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+  .modal-icon {
+    width: 56px; height: 56px; margin: 0 auto 20px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  }
+  .modal-icon.success { background: rgba(34,197,94,0.12); }
+  .modal-icon.error { background: rgba(224,32,32,0.12); }
+  .modal-icon svg { width: 26px; height: 26px; }
+  .modal-icon.success svg { stroke: #22c55e; }
+  .modal-icon.error svg { stroke: var(--accent-red); }
+  .modal-title {
+    font-family: 'Open Sans', sans-serif; font-weight: 700;
+    font-size: 19px; color: var(--text-bright); margin-bottom: 10px;
+  }
+  .modal-text {
+    font-size: 13.5px; font-weight: 300; color: var(--text-muted);
+    line-height: 1.6; margin-bottom: 28px;
+  }
+  .modal-close-btn {
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    padding: 12px 32px; border-radius: 50px; border: none;
+    background: var(--accent-red); color: #fff; cursor: pointer;
+    letter-spacing: 0.02em; transition: all 0.25s;
+  }
+  .modal-close-btn:hover { background: var(--accent-red-hover); transform: translateY(-1px); }
+  .modal-icon.error ~ .modal-close-btn,
+  .modal-box:has(.modal-icon.error) .modal-close-btn {
+    background: rgba(255,255,255,0.08); color: var(--text-bright);
+  }
+  .modal-box:has(.modal-icon.error) .modal-close-btn:hover { background: rgba(255,255,255,0.14); }
+ 
   @media (max-width: 640px) {
     .page-header { padding: 140px 6vw 48px; }
     .form-section { padding: 0 6vw 80px; }
@@ -223,7 +276,10 @@
 </header>
  
 <section class="form-section" aria-labelledby="contact-form-title">
-  <form class="form-card" id="contactForm">
+  <form class="form-card" id="contactForm" action="https://api.web3forms.com/submit" method="POST">
+    <input type="hidden" name="access_key" value="182f1354-a5ce-4535-b48e-a16ad61ced36" />
+    <input type="hidden" name="subject" value="New Contact Form Submission - FEASPACK" />
+    <input type="hidden" name="from_name" value="FEASPACK Website" />
     <h2 class="form-title" id="contact-form-title" style="font-family:'Open Sans',sans-serif;font-weight:700;font-size:clamp(18px,2vw,24px);color:var(--text-bright);margin-bottom:28px;">Send Us a Message</h2>
  
     <div class="form-grid">
@@ -281,6 +337,19 @@
   </div>
 </footer>
  
+<div class="modal-overlay" id="formModal">
+  <div class="modal-box">
+    <div class="modal-icon success" id="modalIcon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    <h3 class="modal-title" id="modalTitle">Message Sent</h3>
+    <p class="modal-text" id="modalText">Thank you! Your message has been received. Our team will reach out shortly.</p>
+    <button class="modal-close-btn" id="modalCloseBtn">OK</button>
+  </div>
+</div>
+ 
 <script>
   // Hamburger menu
   const hamburger = document.getElementById('navHamburger');
@@ -302,15 +371,66 @@
     }
   });
  
-  // Simple form submit feedback (no backend wired up)
+  // Form submit -> Web3Forms
   const contactForm = document.getElementById('contactForm');
-  contactForm.addEventListener('submit', (e) => {
+  const submitBtn = contactForm.querySelector('.btn-submit');
+  const originalBtnText = submitBtn.innerHTML;
+ 
+  const modal = document.getElementById('formModal');
+  const modalIcon = document.getElementById('modalIcon');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalText = document.getElementById('modalText');
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+ 
+  const successIconSVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+  const errorIconSVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16" x2="12.01" y2="16"></line><circle cx="12" cy="12" r="10"></circle></svg>';
+ 
+  function showModal(type, title, text) {
+    modalIcon.className = 'modal-icon ' + type;
+    modalIcon.innerHTML = type === 'success' ? successIconSVG : errorIconSVG;
+    modalTitle.textContent = title;
+    modalText.textContent = text;
+    modal.classList.add('open');
+  }
+ 
+  function closeModal() {
+    modal.classList.remove('open');
+  }
+ 
+  modalCloseBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+ 
+  contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    alert('Thank you! Your message has been received. Our team will reach out shortly.');
-    contactForm.reset();
+ 
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Sending...';
+ 
+    try {
+      const formData = new FormData(contactForm);
+      const response = await fetch(contactForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+      const result = await response.json();
+ 
+      if (result.success) {
+        showModal('success', 'Message Sent', 'Thank you! Your message has been received. Our team will reach out shortly.');
+        contactForm.reset();
+      } else {
+        showModal('error', 'Something Went Wrong', 'Sorry, we couldn\'t send your message. Please try again or email us directly.');
+      }
+    } catch (error) {
+      showModal('error', 'Connection Error', 'Sorry, something went wrong. Please check your connection and try again.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+    }
   });
 </script>
  
 </body>
 </html>
- 
