@@ -233,8 +233,16 @@
    }
    .footer-brand {
      flex-direction: column;
+     align-items: flex-start; 
    }
-  .footer-logo { height: 30px; width: auto; display: block; margin-bottom: 12px; }
+  .footer-logo {
+     height: 30px;
+     width: auto;
+     display: block;
+     margin-bottom: 12px;
+     object-fit: contain; 
+     flex-shrink: 0;
+   }
   .footer-tagline { font-size: 12.5px; font-weight: 300; color: var(--text-dim); line-height: 1.6; max-width: 240px; }
   .footer-nav {
     display: flex;
