@@ -218,13 +218,36 @@
  
   /* FOOTER */
   .footer { background: #070910; border-top: 1px solid var(--border); padding: 48px 5vw 0; }
-  .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding-bottom: 40px; border-bottom: 1px solid var(--border); }
+  .footer-inner {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     gap: 32px;
+     padding-bottom: 40px;
+     border-bottom: 1px solid var(--border);
+   }
+   .footer-brand,
+   .footer-socials {
+     flex: 1 1 0;
+     display: flex;
+   }
+   .footer-brand {
+     flex-direction: column;
+   }
   .footer-logo { height: 30px; width: auto; display: block; margin-bottom: 12px; }
   .footer-tagline { font-size: 12.5px; font-weight: 300; color: var(--text-dim); line-height: 1.6; max-width: 240px; }
-  .footer-nav { display: flex; gap: 32px; }
+  .footer-nav {
+    display: flex;
+    gap: 32px;
+    flex: 0 0 auto;
+    justify-content: center;
+  }
   .footer-nav a { font-size: 13.5px; font-weight: 400; color: var(--text-dim); text-decoration: none; transition: color 0.2s; letter-spacing: 0.01em; }
   .footer-nav a:hover { color: var(--text-bright); }
-  .footer-socials { display: flex; gap: 12px; }
+  .footer-socials {
+     justify-content: flex-end;
+     gap: 12px;
+   }
   .footer-socials a { width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-dim); text-decoration: none; transition: all 0.2s; }
   .footer-socials a:hover { border-color: var(--accent-red); color: var(--accent-red); }
   .footer-socials svg { width: 17px; height: 17px; }
